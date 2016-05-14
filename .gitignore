@@ -18,6 +18,9 @@
 .deps/
 .dirstamp
 /.libs/
+/install-tree
 /libtool
 /Makefile
 /Makefile.in
+/src/c-sundry.pc
+/test-api
