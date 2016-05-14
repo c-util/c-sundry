@@ -43,7 +43,10 @@ AM_LDFLAGS = $(OUR_LDFLAGS)
 # API headers
 
 include_HEADERS += \
-	src/c-macro.h
+	src/c-bitmap.h \
+	src/c-macro.h \
+	src/c-string.h \
+	src/c-usec.h
 
 %.pc: %.pc.in
 	$(AM_V_GEN)$(SED) \
@@ -65,10 +68,14 @@ CLEANFILES += \
 # test-api
 
 default_tests += \
-	test-api
+	test-api \
+	test-bitmap
 
 test_api_SOURCES = \
 	src/test-api.c
+
+test_bitmap_SOURCES = \
+	src/test-bitmap.c
 
 # ------------------------------------------------------------------------------
 # test suite
