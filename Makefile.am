@@ -45,6 +45,22 @@ AM_LDFLAGS = $(OUR_LDFLAGS)
 include_HEADERS += \
 	src/c-macro.h
 
+%.pc: %.pc.in
+	$(AM_V_GEN)$(SED) \
+		-e 's,@includedir\@,$(includedir),g' \
+		-e 's,@libdir\@,$(libdir),g' \
+		-e 's,@VERSION\@,$(VERSION),g' \
+		$< > $@
+
+pkgconfiglib_DATA += \
+	src/c-sundry.pc
+
+EXTRA_DIST += \
+	src/c-sundry.pc.in
+
+CLEANFILES += \
+	src/c-sundry.pc
+
 # ------------------------------------------------------------------------------
 # test-api
 
