@@ -46,7 +46,7 @@ include_HEADERS += \
 	src/c-bitmap.h \
 	src/c-macro.h \
 	src/c-string.h \
-	src/c-sys.h \
+	src/c-syscall.h \
 	src/c-usec.h
 
 %.pc: %.pc.in

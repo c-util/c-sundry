@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /**
- * c_sys_clone() - wrapper for raw clone(2) syscall
+ * c_syscall_clone() - wrapper for raw clone(2) syscall
  * @flags:              clone flags
  * @child_stack:        location of the stack used by the child process
  *
@@ -37,7 +37,7 @@ extern "C" {
  *
  * Return: The thread ID of the child process on success, -1 on failure.
  */
-static inline int c_sys_clone(unsigned long flags, void *child_stack) {
+static inline int c_syscall_clone(unsigned long flags, void *child_stack) {
 #if defined(__s390__) || defined(__CRIS__)
         return (int)syscall(__NR_clone, child_stack, flags);
 #else
@@ -46,7 +46,7 @@ static inline int c_sys_clone(unsigned long flags, void *child_stack) {
 }
 
 /**
- * c_sys_memfd_create() - wrapper for memfd_create(2) syscall
+ * c_syscall_memfd_create() - wrapper for memfd_create(2) syscall
  * @name:       name for memfd inode
  * @flags:      memfd flags
  *
@@ -55,7 +55,7 @@ static inline int c_sys_clone(unsigned long flags, void *child_stack) {
  *
  * Return: New memfd file-descriptor on success, -1 on failure.
  */
-static inline int c_sys_memfd_create(const char *name, unsigned int flags) {
+static inline int c_syscall_memfd_create(const char *name, unsigned int flags) {
         return syscall(__NR_memfd_create, name, flags);
 }
 

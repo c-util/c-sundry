@@ -29,11 +29,11 @@
 extern "C" {
 #endif
 
-_c_pure_ static inline bool c_str_equal(const char *a, const char *b) {
+_c_pure_ static inline bool c_string_equal(const char *a, const char *b) {
         return (!a || !b) ? (a == b) : !strcmp(a, b);
 }
 
-_c_pure_ static inline char *c_str_prefix(const char *str, const char *prefix) {
+_c_pure_ static inline char *c_string_prefix(const char *str, const char *prefix) {
         size_t l = strlen(prefix);
         return !strncmp(str, prefix, l) ? (char *)str + l : NULL;
 }
