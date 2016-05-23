@@ -31,6 +31,16 @@
 #include "c-syscall.h"
 #include "c-usec.h"
 
+static void test_syscall(void) {
+        int r;
+
+        r = c_syscall_clone(~0UL, NULL);
+        assert(r < 0);
+
+        r = c_syscall_memfd_create(NULL, ~0U);
+        assert(r < 0);
+}
+
 static void test_usec(void) {
         uint64_t u_time;
 
@@ -43,6 +53,7 @@ static void test_usec(void) {
 }
 
 int main(int argc, char **argv) {
+        test_syscall();
         test_usec();
         return 0;
 }
