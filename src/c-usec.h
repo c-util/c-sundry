@@ -18,13 +18,10 @@
 ***/
 
 #include <assert.h>
-#include <c-macro.h>
 #include <inttypes.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <time.h>
-#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {
