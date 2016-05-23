@@ -26,8 +26,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "c-bitmap.h"
 #include "c-macro.h"
+#include "c-syscall.h"
+#include "c-usec.h"
+
+static void test_usec(void) {
+        uint64_t u_time;
+
+        u_time = c_usec_from_clock(CLOCK_MONOTONIC);
+        u_time = c_usec_from_nsec(u_time);
+        u_time = c_usec_from_msec(u_time);
+        u_time = c_usec_from_sec(u_time);
+        u_time = c_usec_from_timespec(&(struct timespec){});
+        u_time = c_usec_from_timeval(&(struct timeval){});
+}
 
 int main(int argc, char **argv) {
+        test_usec();
         return 0;
 }
