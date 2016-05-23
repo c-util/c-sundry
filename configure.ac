@@ -4,7 +4,7 @@
 AC_PREREQ([2.64])
 AC_INIT([c-sundry],
         [1],
-        [http://www.github.com/c-utils/c-sundry],
+        [http://www.github.com/c-utils/c-sundry/issues],
         [c-sundry],
         [http://www.github.com/c-utils/c-sundry])
 
