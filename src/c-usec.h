@@ -34,6 +34,16 @@ extern "C" {
 #define c_usec_from_timespec(_ts) (c_usec_from_sec((_ts)->tv_sec) + c_usec_from_nsec((_ts)->tv_nsec))
 #define c_usec_from_timeval(_tv) (c_usec_from_sec((_tv)->tv_sec) + (_tv)->tv_usec)
 
+/**
+ * c_usec_from_clock() - read current clock value
+ * @clock:              ID of clock to read
+ *
+ * This reads the current value of the clock specified via @clock. The value is
+ * returned in microsecond precision. The caller must guarantee that the clock
+ * is valid and available on the machine.
+ *
+ * Return: Current clock value in microseconds since EPOCH.
+ */
 static inline uint64_t c_usec_from_clock(clockid_t clock) {
         struct timespec ts;
         int r;
