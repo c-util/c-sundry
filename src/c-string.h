@@ -18,12 +18,9 @@
 ***/
 
 #include <c-macro.h>
-#include <inttypes.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {
