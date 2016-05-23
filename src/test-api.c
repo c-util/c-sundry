@@ -28,8 +28,14 @@
 #include <string.h>
 #include "c-bitmap.h"
 #include "c-macro.h"
+#include "c-string.h"
 #include "c-syscall.h"
 #include "c-usec.h"
+
+static void test_string(void) {
+        assert(!c_string_equal("foo", "bar"));
+        assert(!c_string_prefix("foo", "bar"));
+}
 
 static void test_syscall(void) {
         int r;
@@ -53,6 +59,7 @@ static void test_usec(void) {
 }
 
 int main(int argc, char **argv) {
+        test_string();
         test_syscall();
         test_usec();
         return 0;
