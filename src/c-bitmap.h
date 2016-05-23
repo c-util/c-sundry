@@ -54,11 +54,11 @@ static inline void c_bitmap_clear(void *bitmap, unsigned int bit) {
 }
 
 static inline void c_bitmap_set_all(void *bitmap, unsigned int n_bits) {
-        memset(bitmap, 0xff, n_bits / 8);
+        memset(bitmap, 0xff, c_div_round_up(n_bits, 8));
 }
 
 static inline void c_bitmap_clear_all(void *bitmap, unsigned int n_bits) {
-        memset(bitmap, 0, n_bits / 8);
+        memset(bitmap, 0, c_div_round_up(n_bits, 8));
 }
 
 #ifdef __cplusplus
