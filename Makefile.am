@@ -44,6 +44,7 @@ AM_LDFLAGS = $(OUR_LDFLAGS)
 
 include_HEADERS += \
 	src/c-bitmap.h \
+	src/c-list.h \
 	src/c-macro.h \
 	src/c-string.h \
 	src/c-syscall.h \
@@ -70,13 +71,17 @@ CLEANFILES += \
 
 default_tests += \
 	test-api \
-	test-bitmap
+	test-bitmap \
+	test-list
 
 test_api_SOURCES = \
 	src/test-api.c
 
 test_bitmap_SOURCES = \
 	src/test-bitmap.c
+
+test_list_SOURCES = \
+	src/test-list.c
 
 # ------------------------------------------------------------------------------
 # test suite
