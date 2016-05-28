@@ -78,6 +78,26 @@ static inline void c_list_append(CList *list, CListEntry *entry) {
         list->last = entry;
 }
 
+static inline CListEntry *c_list_first(CList *list) {
+        assert(!list->first == !list->last);
+
+        return list->first;
+}
+
+static inline CListEntry *c_list_last(CList *list) {
+        assert(!list->first == !list->last);
+
+        return list->last;
+}
+
+static inline CListEntry *c_list_entry_prev(CListEntry *entry) {
+        return entry->prev;
+}
+
+static inline CListEntry *c_list_entry_next(CListEntry *entry) {
+        return entry->next;
+}
+
 static inline void c_list_remove(CList *list, CListEntry *entry) {
         assert(list->first && list->last);
 
