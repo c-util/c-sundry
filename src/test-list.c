@@ -66,7 +66,8 @@ static void test_list(void) {
 
         assert(!list.first && !list.last);
         for (unsigned int i = 0; i < 4; ++i)
-                assert(!entries[i].prev && !entries[i].next);
+                assert(entries[i].prev == &entries[i] &&
+                       entries[i].next == &entries[i]);
 }
 
 int main(int argc, char **argv) {

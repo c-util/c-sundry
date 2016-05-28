@@ -42,39 +42,48 @@ static inline void c_list_init(CList *list) {
 }
 
 static inline void c_list_entry_init(CListEntry *entry) {
-        if (entry)
-                *entry = (CListEntry){};
+        if (!entry)
+                return;
+
+        entry->prev = entry;
+        entry->next = entry;
+}
+
+static inline _Bool c_list_entry_is_linked(CListEntry *e) {
+        return e && e->prev != e;
 }
 
 static inline void c_list_prepend(CList *list, CListEntry *entry) {
-        assert(!entry->prev);
-        assert(!entry->next);
+        assert(!c_list_entry_is_linked(entry));
 
         if (!list->last) {
                 assert(!list->first);
                 list->last = entry;
+                entry->next = NULL;
         } else {
                 assert(list->first);
                 list->first->prev = entry;
                 entry->next = list->first;
         }
 
+        entry->prev = NULL;
         list->first = entry;
 }
 
 static inline void c_list_append(CList *list, CListEntry *entry) {
-        assert(!entry->prev);
-        assert(!entry->next);
+        assert(!c_list_entry_is_linked(entry));
 
         if (!list->first) {
                 assert(!list->last);
                 list->first = entry;
+                entry->prev = NULL;
         } else {
                 assert(list->last);
                 list->last->next = entry;
                 entry->prev = list->last;
         }
 
+        entry->next = NULL;
         list->last = entry;
 }
 
@@ -91,14 +100,23 @@ static inline CListEntry *c_list_last(CList *list) {
 }
 
 static inline CListEntry *c_list_entry_prev(CListEntry *entry) {
-        return entry->prev;
+        if (c_list_entry_is_linked(entry))
+                return entry->prev;
+        else
+                return NULL;
 }
 
 static inline CListEntry *c_list_entry_next(CListEntry *entry) {
-        return entry->next;
+        if (c_list_entry_is_linked(entry))
+                return entry->next;
+        else
+                return NULL;
 }
 
 static inline void c_list_remove(CList *list, CListEntry *entry) {
+        if (!c_list_entry_is_linked(entry))
+                return;
+
         assert(list->first && list->last);
 
         if (list->first == entry) {
@@ -117,8 +135,7 @@ static inline void c_list_remove(CList *list, CListEntry *entry) {
                 entry->next->prev = entry->prev;
         }
 
-        entry->prev = NULL;
-        entry->next = NULL;
+        c_list_entry_init(entry);
 }
 
 #ifdef __cplusplus
