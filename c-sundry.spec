@@ -1,6 +1,6 @@
 Name:           c-sundry
 Version:        1
-Release:        2
+Release:        3
 Summary:        sundry convenience headers
 License:        LGPL2+
 URL:            https://github.com/c-util/c-sundry
@@ -34,6 +34,9 @@ make %{?_smp_mflags}
 %{_libdir}/pkgconfig/c-sundry.pc
 
 %changelog
+* Thu Jun 2 2016 <lars@uebernic.de> 1-3
+- update for c-list.h
+
 * Sun May 15 2016 <kay@redhat.com> 1-2
 - update for c-syscall.h
 
