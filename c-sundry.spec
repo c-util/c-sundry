@@ -1,10 +1,10 @@
 Name:           c-sundry
 Version:        1
-Release:        3
-Summary:        sundry convenience headers
-License:        LGPL2+
+Release:        4%{?dist}
+Summary:        Sundry Convenience Headers
+License:        LGPLv2+
 URL:            https://github.com/c-util/c-sundry
-Source0:        %{name}.tar.xz
+Source0:        https://github.com/c-util/c-sundry/archive/v%{version}.tar.gz
 BuildRequires:  autoconf automake pkgconfig
 %define debug_package %{nil}
 
@@ -29,11 +29,15 @@ make %{?_smp_mflags}
 %make_install
 
 %files devel
-%doc COPYING
+%license COPYING
+%license LICENSE.LGPL2.1
 %{_includedir}/c-*.h
 %{_libdir}/pkgconfig/c-sundry.pc
 
 %changelog
+* Tue Jun 21 2016 <kay@redhat.com> 1-4
+- update spec file according to Fedora guidelines
+
 * Thu Jun 2 2016 <lars@uebernic.de> 1-3
 - update for c-list.h
 
