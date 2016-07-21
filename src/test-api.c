@@ -28,9 +28,44 @@
 #include <string.h>
 #include "c-bitmap.h"
 #include "c-macro.h"
+#include "c-ref.h"
 #include "c-string.h"
 #include "c-syscall.h"
 #include "c-usec.h"
+
+static void test_ref_release(CRef *ref, void *userdata) {
+        assert(userdata == (void *)0xdeadbeefUL);
+
+        assert(!c_ref_inc_unless_zero(ref));
+        assert(!c_ref_add_unless_zero(ref, 16));
+
+        *ref = (CRef)C_REF_INIT;
+        c_ref_add(ref, 15);
+}
+
+static void test_ref(void) {
+        CRef ref = C_REF_INIT;
+
+        assert(ref.n_refs == 1);
+        c_ref_inc(&ref);
+        assert(ref.n_refs == 2);
+        c_ref_add(&ref, 14);
+        assert(ref.n_refs == 16);
+        c_ref_dec(&ref, NULL, NULL);
+        assert(ref.n_refs == 15);
+        c_ref_sub(&ref, 13, c_ref_unreachable, NULL);
+        assert(ref.n_refs == 2);
+
+        ref = (CRef)C_REF_INIT;
+        assert(ref.n_refs == 1);
+
+        c_ref_inc_unless_zero(&ref);
+        assert(ref.n_refs == 2);
+        c_ref_add_unless_zero(&ref, 2);
+        assert(ref.n_refs == 4);
+        c_ref_sub(&ref, 4, test_ref_release, (void *)0xdeadbeefUL);
+        assert(ref.n_refs == 16);
+}
 
 static void test_string(void) {
         assert(!c_string_equal("foo", "bar"));
@@ -59,6 +94,7 @@ static void test_usec(void) {
 }
 
 int main(int argc, char **argv) {
+        test_ref();
         test_string();
         test_syscall();
         test_usec();
