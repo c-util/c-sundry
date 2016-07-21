@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 typedef struct CRef CRef;
-typedef void (*CRefCallback) (CRef *ref, void *userdata);
+typedef void (*CRefFn) (CRef *ref, void *userdata);
 
 /**
  * struct CRef - atomic reference counter
@@ -208,7 +208,7 @@ static inline void c_ref_unreachable(CRef *ref, void *userdata) {
  *
  * Return: NULL is returned.
  */
-static inline CRef *c_ref_sub(CRef *ref, unsigned long n, CRefCallback func, void *userdata) {
+static inline CRef *c_ref_sub(CRef *ref, unsigned long n, CRefFn func, void *userdata) {
         unsigned long n_refs;
 
         if (ref) {
@@ -245,7 +245,7 @@ static inline CRef *c_ref_sub(CRef *ref, unsigned long n, CRefCallback func, voi
  *
  * Return: NULL is returned.
  */
-static inline CRef *c_ref_dec(CRef *ref, CRefCallback func, void *userdata) {
+static inline CRef *c_ref_dec(CRef *ref, CRefFn func, void *userdata) {
         return c_ref_sub(ref, 1UL, func, userdata);
 }
 
