@@ -59,6 +59,17 @@ static inline int c_syscall_memfd_create(const char *name, unsigned int flags) {
         return syscall(__NR_memfd_create, name, flags);
 }
 
+/**
+ * c_syscall_gettid() - wrapper for gettid(2) syscall
+ *
+ * This is a wrapper for the gettid(2) syscall. Currently, no user-space
+ * wrapper is exported by any libc.
+ *
+ * Return: Thread ID of calling process.
+ */
+static inline int c_syscall_gettid(void) {
+        return syscall(SYS_gettid);
+}
 #ifdef __cplusplus
 }
 #endif
