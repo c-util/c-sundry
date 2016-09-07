@@ -1,21 +1,11 @@
 #pragma once
 
-/***
-  This file is part of c-sundry. See COPYING for details.
-
-  c-sundry is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  c-sundry is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with c-sundry; If not, see <http://www.gnu.org/licenses/>.
-***/
+/*
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ */
 
 #include <assert.h>
 #include <stdatomic.h>
@@ -25,34 +15,15 @@
 extern "C" {
 #endif
 
-typedef struct CRef CRef;
-typedef void (*CRefFn) (CRef *ref, void *userdata);
-
-/**
- * struct CRef - atomic reference counter
- * @n_refs:             current number of references owned
- *
- * The CRef object implements an atomic reference counter to be embedded in
- * other objects. It supports lockless acquire/release operations between
- * multiple threads.
- *
- * The reference counter is initialized to 1. Once it drops to 0, no more
- * references can be acquired and the object can be released asynchronously.
- * The current number of references can be fetched by reading @n_refs directly,
- * or optionally via atomic_load_explicit(&ref->n_refs, memory_order_relaxed).
- */
-struct CRef {
-        _Atomic unsigned long n_refs;
-};
+typedef void (*CRefFn) (_Atomic unsigned long *ref, void *userdata);
 
 /**
  * C_REF_INIT - initialize static reference counter
  *
- * This provides a static initializer for a CRef object. It is meant to be used
- * as assignment for static variables. To initialize non-static variables, cast
- * the lvalue to CRef before assigning it.
+ * This provides a static initializer for a reference counter. It is meant to
+ * be used as assignment for variables or member fields.
  */
-#define C_REF_INIT { .n_refs = ATOMIC_VAR_INIT(1UL), }
+#define C_REF_INIT ATOMIC_VAR_INIT(1UL)
 
 /**
  * c_ref_add() - acquire references
@@ -68,7 +39,7 @@ struct CRef {
  *
  * Return: @ref is returned.
  */
-static inline CRef *c_ref_add(CRef *ref, unsigned long n) {
+static inline _Atomic unsigned long *c_ref_add(_Atomic unsigned long *ref, unsigned long n) {
         unsigned long n_refs;
 
         assert(n > 0);
@@ -79,8 +50,7 @@ static inline CRef *c_ref_add(CRef *ref, unsigned long n) {
                  * should place decisions based on this operations, ever! So no
                  * need to order it.
                  */
-                n_refs = atomic_fetch_add_explicit(&ref->n_refs, n,
-                                                   memory_order_relaxed);
+                n_refs = atomic_fetch_add_explicit(ref, n, memory_order_relaxed);
                 assert(n_refs > 0);
         }
 
@@ -110,32 +80,29 @@ static inline CRef *c_ref_add(CRef *ref, unsigned long n) {
  *
  * Return: @ref is returned on success, otherwise NULL is returned.
  */
-static inline CRef *c_ref_add_unless_zero(CRef *ref, unsigned long n) {
+static inline _Atomic unsigned long *c_ref_add_unless_zero(_Atomic unsigned long *ref, unsigned long n) {
         unsigned long n_refs;
 
         assert(n > 0);
 
         if (ref) {
                 /*
-                 * Try replacing ref->n_refs with (n->n_refs + n). This
-                 * requires us to fetch the value and loop on cmpxchg. On
-                 * failure, bail out with NULL. Otherwise, retry until we
-                 * completed the operation.
+                 * Try replacing *ref with (*ref + n). This requires us to
+                 * fetch the value and loop on cmpxchg. On failure, bail out
+                 * with NULL. Otherwise, retry until we completed the task.
                  * Note that we do not provide barriers. We expect the caller
                  * to synchronize via the actual pointer of the object. If this
                  * function fails, the caller should not use this information
                  * to deduce the state of the object. It must rely on external
                  * synchronization, if that is required.
                  */
-                n_refs = atomic_load_explicit(&ref->n_refs,
-                                              memory_order_relaxed);
+                n_refs = atomic_load_explicit(ref, memory_order_relaxed);
                 do {
                         if (n_refs == 0)
                                 return NULL;
-                } while (!atomic_compare_exchange_weak_explicit(&ref->n_refs,
-                                                &n_refs, n_refs + n,
-                                                memory_order_relaxed,
-                                                memory_order_relaxed));
+                } while (!atomic_compare_exchange_weak_explicit(ref, &n_refs, n_refs + n,
+                                                                memory_order_relaxed,
+                                                                memory_order_relaxed));
         }
 
         return ref;
@@ -152,7 +119,7 @@ static inline CRef *c_ref_add_unless_zero(CRef *ref, unsigned long n) {
  *
  * Return: @ref is returned.
  */
-static inline CRef *c_ref_inc(CRef *ref) {
+static inline _Atomic unsigned long *c_ref_inc(_Atomic unsigned long *ref) {
         return c_ref_add(ref, 1UL);
 }
 
@@ -167,7 +134,7 @@ static inline CRef *c_ref_inc(CRef *ref) {
  *
  * Return: @ref is returned on success, otherwise NULL is returned.
  */
-static inline CRef *c_ref_inc_unless_zero(CRef *ref) {
+static inline _Atomic unsigned long *c_ref_inc_unless_zero(_Atomic unsigned long *ref) {
         return c_ref_add_unless_zero(ref, 1UL);
 }
 
@@ -181,7 +148,7 @@ static inline CRef *c_ref_inc_unless_zero(CRef *ref) {
  * drop to 0. This release callback will abort the application if it is
  * actually called.
  */
-static inline void c_ref_unreachable(CRef *ref, void *userdata) {
+static inline void c_ref_unreachable(_Atomic unsigned long *ref, void *userdata) {
         assert(0);
 }
 
@@ -208,7 +175,7 @@ static inline void c_ref_unreachable(CRef *ref, void *userdata) {
  *
  * Return: NULL is returned.
  */
-static inline CRef *c_ref_sub(CRef *ref, unsigned long n, CRefFn func, void *userdata) {
+static inline _Atomic unsigned long *c_ref_sub(_Atomic unsigned long *ref, unsigned long n, CRefFn func, void *userdata) {
         unsigned long n_refs;
 
         if (ref) {
@@ -220,8 +187,7 @@ static inline CRef *c_ref_sub(CRef *ref, unsigned long n, CRefFn func, void *use
                  * perform the acquire-barrier only in the release-path, since
                  * it is only needed there.
                  */
-                n_refs = atomic_fetch_sub_explicit(&ref->n_refs, n,
-                                                   memory_order_release);
+                n_refs = atomic_fetch_sub_explicit(ref, n, memory_order_release);
                 assert(n_refs >= n);
                 if (n_refs == n) {
                         atomic_thread_fence(memory_order_acquire);
@@ -245,7 +211,7 @@ static inline CRef *c_ref_sub(CRef *ref, unsigned long n, CRefFn func, void *use
  *
  * Return: NULL is returned.
  */
-static inline CRef *c_ref_dec(CRef *ref, CRefFn func, void *userdata) {
+static inline _Atomic unsigned long *c_ref_dec(_Atomic unsigned long *ref, CRefFn func, void *userdata) {
         return c_ref_sub(ref, 1UL, func, userdata);
 }
 
