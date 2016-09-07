@@ -70,6 +70,7 @@ static inline int c_syscall_memfd_create(const char *name, unsigned int flags) {
 static inline int c_syscall_gettid(void) {
         return syscall(SYS_gettid);
 }
+
 #ifdef __cplusplus
 }
 #endif
