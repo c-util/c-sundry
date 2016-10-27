@@ -15,6 +15,7 @@
 extern "C" {
 #endif
 
+typedef _Atomic unsigned long CRef;
 typedef void (*CRefFn) (_Atomic unsigned long *ref, void *userdata);
 
 /**
