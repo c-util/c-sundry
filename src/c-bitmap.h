@@ -1,31 +1,24 @@
 #pragma once
 
-/***
-  This file is part of c-sundry. See COPYING for details.
-
-  c-sundry is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  c-sundry is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with c-sundry; If not, see <http://www.gnu.org/licenses/>.
-***/
-
-#include <c-macro.h>
-#include <inttypes.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
+/*
+ * Dynamic Bitmaps
+ *
+ * This implements helpers to deal with dynamically sized bitmaps. Allocation
+ * and management is left to the caller. This just provides convenience helpers
+ * to set, clear, and test a single bit (or all bits).
+ *
+ * Bitmaps must be of type `uint8_t[]' (i.e., byte arrays). The LSB of the
+ * first element of the array is addressed as bit `0'. The MSB of the last
+ * element of the array is addressed as bit `n', where `n' is the number of
+ * bits in the bitmap.
+ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <c-macro.h>
+#include <stdlib.h>
 
 /**
  * c_bitmap_test() - test bit in bitmap

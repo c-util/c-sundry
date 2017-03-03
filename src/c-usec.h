@@ -1,31 +1,23 @@
 #pragma once
 
-/***
-  This file is part of c-sundry. See COPYING for details.
+/*
+ * Time Handling
+ *
+ * The `time_t' set of functions are usually of little use if you need precise
+ * timing in the sub-second range. This module implements helpers to deal with
+ * time-related operations with microsecond precision. A `uint64_t' is used as
+ * datatype.
+ */
 
-  c-sundry is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  c-sundry is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with c-sundry; If not, see <http://www.gnu.org/licenses/>.
-***/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <assert.h>
 #include <inttypes.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <time.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* uint64_t stores up to 584,942.417355 years in microseconds */
 #define c_usec_from_nsec(_nsec) ((_nsec) / UINT64_C(1000))
@@ -42,7 +34,7 @@ extern "C" {
  * returned in microsecond precision. The caller must guarantee that the clock
  * is valid and available on the machine.
  *
- * Return: Current clock value in microseconds since EPOCH.
+ * Return: Current clock value in microseconds.
  */
 static inline uint64_t c_usec_from_clock(clockid_t clock) {
         struct timespec ts;

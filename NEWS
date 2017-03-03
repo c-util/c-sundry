@@ -1,0 +1,13 @@
+c-sundry - Collection of C sundries
+
+CHANGES WITH 1:
+
+        * Initial release of c-sundry.
+
+        * This project provides a collection of C sundries, which, for whatever
+          reason, do not constitute their own repository. License is ASL-2.0
+          and the build system used is `Meson'.
+
+        Contributions from: David Herrmann, Kay Sievers, Tom Gundersen
+
+        - Berlin, 2017-03-03

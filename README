@@ -1,4 +1,4 @@
-c-sundry - Collection of sundry convenience headers
+c-sundry - Collection of C sundries
 
 DETAILS:
         https://github.com/c-util/c-sundry
@@ -14,5 +14,5 @@ GITWEB:
         https://github.com/c-util/c-sundry
 
 LICENSE:
-        LGPLv2.1+ (LICENSE.LGPL2.1)
+        Apache Software License 2.0 (LICENSE-APACHE)
         See COPYING for details.

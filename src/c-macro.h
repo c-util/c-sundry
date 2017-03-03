@@ -1,27 +1,10 @@
 #pragma once
 
-/***
-  This file is part of c-sundry. See COPYING for details.
-
-  c-sundry is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  c-sundry is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with c-sundry; If not, see <http://www.gnu.org/licenses/>.
-***/
-
 /*
- * Macros
+ * Selection of Convenience Macros
+ *
  * This header contains macros useful across our codebase. This includes
- * pre-processor macros and a *very* limited set of inlined functions that are
- * used throughout the code-base.
+ * pre-processor macros and a *very* limited set of inlined functions.
  *
  * As this header is included all over the place, make sure to only add stuff
  * that really belongs all-over-the-place.
@@ -53,6 +36,10 @@
  *    'p' suffix (e.g., c_freep(), c_closep(), ...).
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Basic ISO-C11/POSIX headers are considered API of this header. Don't remove
  * them as we rely on them in our sources.
@@ -68,14 +55,11 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
-/* must not depend on any other c-header */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* must not depend on any other c-util header */
 
 /*
  * We require:

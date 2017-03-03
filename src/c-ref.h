@@ -1,19 +1,23 @@
 #pragma once
 
 /*
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation; either version 2.1 of the License, or (at
- * your option) any later version.
+ * Atomic Reference Counter
+ *
+ * This implements an atomic reference counter. That is, references can be
+ * acquired and released from multiple threads in parallel.
+ *
+ * To use CRef, an object needs a member of type `_Atomic unsigned long', which
+ * counts the references. All functions here take it as first argument and only
+ * operate on this one field.
  */
-
-#include <assert.h>
-#include <stdatomic.h>
-#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <assert.h>
+#include <stdatomic.h>
+#include <stdlib.h>
 
 typedef void (*CRefFn) (_Atomic unsigned long *ref, void *userdata);
 

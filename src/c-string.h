@@ -1,30 +1,19 @@
 #pragma once
 
-/***
-  This file is part of c-sundry. See COPYING for details.
-
-  c-sundry is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  c-sundry is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with c-sundry; If not, see <http://www.gnu.org/licenses/>.
-***/
-
-#include <c-macro.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
+/*
+ * String Helpers
+ *
+ * This is a collection of helper functions operating on standard C strings
+ * (i.e., zero-terminated character arrays). They extend the ISO str*() class
+ * of function and behave in a similar manner.
+ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <c-macro.h>
+#include <stdlib.h>
 
 /**
  * c_string_equal() - compare strings for equality
