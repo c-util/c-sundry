@@ -13,7 +13,6 @@
 extern "C" {
 #endif
 
-#include <linux/memfd.h>
 #include <stdlib.h>
 #include <sys/resource.h>
 #include <sys/syscall.h>
@@ -48,7 +47,17 @@ static inline int c_syscall_clone(unsigned long flags, void *child_stack) {
  * Return: New memfd file-descriptor on success, -1 on failure.
  */
 static inline int c_syscall_memfd_create(const char *name, unsigned int flags) {
-        return (int)syscall(__NR_memfd_create, name, flags);
+        /* Make Travis happy. */
+#if defined __NR_memfd_create
+        long nr = __NR_memfd_create;
+#elif defined __x86_64__
+        long nr = 319;
+#elif defined __i386__
+        long nr = 356;
+#else
+#  error "__NR_memfd_create is undefined"
+#endif
+        return (int)syscall(nr, name, flags);
 }
 
 /**
