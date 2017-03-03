@@ -18,7 +18,7 @@ static void test_ref_release(_Atomic unsigned long *ref, void *userdata) {
         assert(!c_ref_inc_unless_zero(ref));
         assert(!c_ref_add_unless_zero(ref, 16));
 
-        *ref = (_Atomic unsigned long)C_REF_INIT;
+        *ref = C_REF_INIT;
         c_ref_add(ref, 15);
 }
 
@@ -35,7 +35,7 @@ static void test_ref(void) {
         c_ref_sub(&ref, 13, c_ref_unreachable, NULL);
         assert(ref == 2);
 
-        ref = (_Atomic unsigned long)C_REF_INIT;
+        ref = C_REF_INIT;
         assert(ref == 1);
 
         c_ref_inc_unless_zero(&ref);
