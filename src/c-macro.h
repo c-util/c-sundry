@@ -410,7 +410,8 @@ extern "C" {
 #define c_container_of(_ptr, _type, _member) c_internal_container_of(C_CC_UNIQUE, (_ptr), _type, _member)
 #define c_internal_container_of(_uniq, _ptr, _type, _member)                                    \
         __extension__ ({                                                                        \
-                const __typeof__( ((_type*)0)->_member ) *C_VAR(A, _uniq) = (_ptr);             \
+                /* avoid `__typeof__' since it strips qualifiers */                             \
+                __auto_type C_VAR(A, _uniq) = 0 ? &((const _type *)0)->_member : (_ptr);        \
                 (_ptr) ? (_type*)( (char*)C_VAR(A, _uniq) - offsetof(_type, _member) ) : NULL;  \
         })
 
