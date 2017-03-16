@@ -104,6 +104,26 @@ extern "C" {
 #define _c_weakref_(_x) __attribute__((__weakref__(#_x)))
 
 /**
+ * C_DECL() - create declaration-expression
+ * @_expr:              expression to evaluate to
+ * @_assertion:         arbitrary declaration
+ *
+ * This macro simply evaluates to @_expr. That is, it can be used in any
+ * context that expects an expression like @_expr. Additionally, it takes a
+ * declaration as @_decl and evaluates it.
+ *
+ * Most common usage is in combination with _Static_assert(), which happens
+ * to be defined as a declaration by ISO C11.
+ *
+ * Return: Evaluates to @_expr.
+ */
+#define C_DECL(_expr, _assertion)                                       \
+        /* line split to get better diagnostics on @_assertion usage */ \
+        (__builtin_choose_expr(!!(1 + 0 * sizeof(struct {               \
+        _assertion;                                                     \
+        })), (_expr), ((void)0)))
+
+/**
  * C_TYPE_MATCH() - match two variables/types for unqualified equality
  * @_a:         first variable/type
  * @_b:         second variable/type
