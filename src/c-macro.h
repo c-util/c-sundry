@@ -392,7 +392,19 @@ extern "C" {
  *
  * Return: Evaluates to a constant integer expression
  */
-#define C_ARRAY_SIZE(_x) C_CC_ASSERT_TO(C_TYPE_IS_ARRAY(_x), sizeof(_x) / sizeof((_x)[0]))
+#define C_ARRAY_SIZE(_x)                                                \
+        C_DECL(sizeof(_x) / sizeof((_x)[0]),                            \
+               /*                                                       \
+                * Verify that `_x' is an array, not a pointer. Rely on  \
+                * `&_x[0]' degrading arrays to pointers.                \
+                */                                                      \
+               _Static_assert(                                          \
+                        !__builtin_types_compatible_p(                  \
+                                __typeof__(_x),                         \
+                                __typeof__(&(*(__typeof__(_x)*)0)[0])   \
+                        ),                                              \
+                        "C_ARRAY_SIZE() called with non-array argument" \
+               ))
 
 /**
  * C_DECIMAL_MAX() - calculate maximum length of the decimal
