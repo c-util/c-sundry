@@ -50,11 +50,14 @@ extern "C" {
 #include <fcntl.h>
 #include <inttypes.h>
 #include <limits.h>
+#include <stdalign.h>
 #include <stdarg.h>
+#include <stdatomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdnoreturn.h>
 #include <string.h>
 #include <sys/time.h>
 #include <sys/types.h>
