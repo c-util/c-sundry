@@ -202,7 +202,7 @@ extern "C" {
 /**
  * C_VAR() - generate unique variable name
  * @_x:         name of variable
- * @_uniq:      unique prefix, usually provided by @C_CC_UNIQUE, optional
+ * @_uniq:      unique prefix, usually provided by __COUNTER__, optional
  *
  * This macro shall be used to generate unique variable names, that will not be
  * shadowed by recursive macro invocations. It is effectively a
@@ -307,7 +307,7 @@ extern "C" {
  *
  * Return: Result of @_call is returned.
  */
-#define C_CC_MACRO1(_call, _x) C_INTERNAL_CC_MACRO1(_call, C_CC_UNIQUE, (_x))
+#define C_CC_MACRO1(_call, _x) C_INTERNAL_CC_MACRO1(_call, __COUNTER__, (_x))
 #define C_INTERNAL_CC_MACRO1(_call, _xq, _x)                            \
         C_CC_IF(                                                        \
                 C_CC_IS_CONST(_x),                                      \
@@ -333,7 +333,7 @@ extern "C" {
  *
  * Return: Result of @_call is returned.
  */
-#define C_CC_MACRO2(_call, _x, _y) C_INTERNAL_CC_MACRO2(_call, C_CC_UNIQUE, (_x), C_CC_UNIQUE, (_y))
+#define C_CC_MACRO2(_call, _x, _y) C_INTERNAL_CC_MACRO2(_call, __COUNTER__, (_x), __COUNTER__, (_y))
 #define C_INTERNAL_CC_MACRO2(_call, _xq, _x, _yq, _y)                   \
         C_CC_IF(                                                        \
                 (C_CC_IS_CONST(_x) && C_CC_IS_CONST(_y)),               \
@@ -355,7 +355,7 @@ extern "C" {
  *
  * Return: Result of @_call is returned.
  */
-#define C_CC_MACRO3(_call, _x, _y, _z) C_INTERNAL_CC_MACRO3(_call, C_CC_UNIQUE, (_x), C_CC_UNIQUE, (_y), C_CC_UNIQUE, (_z))
+#define C_CC_MACRO3(_call, _x, _y, _z) C_INTERNAL_CC_MACRO3(_call, __COUNTER__, (_x), __COUNTER__, (_y), __COUNTER__, (_z))
 #define C_INTERNAL_CC_MACRO3(_call, _xq, _x, _yq, _y, _zq, _z)                  \
         C_CC_IF(                                                                \
                 (C_CC_IS_CONST(_x) && C_CC_IS_CONST(_y) && C_CC_IS_CONST(_z)),  \
@@ -442,7 +442,7 @@ extern "C" {
  * @_type:      type of the container struct this is embedded in
  * @_member:    name of the member within the struct
  */
-#define c_container_of(_ptr, _type, _member) c_internal_container_of(C_CC_UNIQUE, (_ptr), _type, _member)
+#define c_container_of(_ptr, _type, _member) c_internal_container_of(__COUNTER__, (_ptr), _type, _member)
 #define c_internal_container_of(_uniq, _ptr, _type, _member)                                    \
         __extension__ ({                                                                        \
                 /* avoid `__typeof__' since it strips qualifiers */                             \
