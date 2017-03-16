@@ -417,24 +417,26 @@ extern "C" {
  *
  * Return: Evaluates to a constant integer expression
  */
-#define C_DECIMAL_MAX(_type)                                                    \
-        _Generic((_type){ 0 },                                                  \
-                char:                   C_INTERNAL_DECIMAL_MAX(_type),          \
-                signed char:            C_INTERNAL_DECIMAL_MAX(_type),          \
-                unsigned char:          C_INTERNAL_DECIMAL_MAX(_type),          \
-                signed short:           C_INTERNAL_DECIMAL_MAX(_type),          \
-                unsigned short:         C_INTERNAL_DECIMAL_MAX(_type),          \
-                signed int:             C_INTERNAL_DECIMAL_MAX(_type),          \
-                unsigned int:           C_INTERNAL_DECIMAL_MAX(_type),          \
-                signed long:            C_INTERNAL_DECIMAL_MAX(_type),          \
-                unsigned long:          C_INTERNAL_DECIMAL_MAX(_type),          \
-                signed long long:       C_INTERNAL_DECIMAL_MAX(_type),          \
-                unsigned long long:     C_INTERNAL_DECIMAL_MAX(_type))
-#define C_INTERNAL_DECIMAL_MAX(_type)                   \
-        (1 + (sizeof(_type) <= 1 ?  3 :                 \
-              sizeof(_type) <= 2 ?  5 :                 \
-              sizeof(_type) <= 4 ? 10 :                 \
-              C_CC_ASSERT_TO(sizeof(_type) <= 8, 20)))
+#define C_DECIMAL_MAX(_arg)                                                             \
+        (_Generic((__typeof__(_arg)){ 0 },                                              \
+                        char: C_INTERNAL_DECIMAL_MAX(sizeof(char)),                     \
+                 signed char: C_INTERNAL_DECIMAL_MAX(sizeof(signed char)),              \
+               unsigned char: C_INTERNAL_DECIMAL_MAX(sizeof(unsigned char)),            \
+                signed short: C_INTERNAL_DECIMAL_MAX(sizeof(signed short)),             \
+              unsigned short: C_INTERNAL_DECIMAL_MAX(sizeof(unsigned short)),           \
+                  signed int: C_INTERNAL_DECIMAL_MAX(sizeof(signed int)),               \
+                unsigned int: C_INTERNAL_DECIMAL_MAX(sizeof(unsigned int)),             \
+                 signed long: C_INTERNAL_DECIMAL_MAX(sizeof(signed long)),              \
+               unsigned long: C_INTERNAL_DECIMAL_MAX(sizeof(unsigned long)),            \
+            signed long long: C_INTERNAL_DECIMAL_MAX(sizeof(signed long long)),         \
+          unsigned long long: C_INTERNAL_DECIMAL_MAX(sizeof(unsigned long long))))
+#define C_INTERNAL_DECIMAL_MAX(_bytes)          \
+        C_DECL(1 + ((_bytes) <= 1 ?  3 :        \
+                    (_bytes) <= 2 ?  5 :        \
+                    (_bytes) <= 4 ? 10 :        \
+                                    20),        \
+               _Static_assert((_bytes) <= 8,    \
+                              "Invalid use of C_INTERNAL_DECIMAL_MAX()"))
 
 /**
  * c_container_of() - cast a member of a structure out to the containing structure
