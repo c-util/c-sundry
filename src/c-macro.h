@@ -537,16 +537,6 @@ extern "C" {
 #define C_ALIGN_TO(_val, _to) (((_val) + (_to) - 1) & ~((_to) - 1))
 
 /**
- * c_align() - align to native size
- * @_val:       value to align
- *
- * This is the same as c_align_to((_val), __SIZEOF_POINTER__).
- *
- * Return: @_val aligned to the native size
- */
-#define c_align(_val) c_align_to((_val), __SIZEOF_POINTER__)
-
-/**
  * c_align8() - align value to multiple of 8
  * @_val:       value to align
  *
