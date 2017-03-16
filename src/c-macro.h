@@ -197,14 +197,14 @@ extern "C" {
  *
  * Return: Result of @_call is returned.
  */
-#define C_CC_MACRO1(_call, _x) C_INTERNAL_CC_MACRO1(_call, __COUNTER__, (_x))
-#define C_INTERNAL_CC_MACRO1(_call, _xq, _x)                            \
+#define C_CC_MACRO1(_call, _x, ...) C_INTERNAL_CC_MACRO1(_call, __COUNTER__, (_x), ## __VA_ARGS__)
+#define C_INTERNAL_CC_MACRO1(_call, _xq, _x, ...)                       \
         C_CC_IF(                                                        \
                 C_CC_IS_CONST(_x),                                      \
-                _call(_x),                                              \
+                _call(_x, ## __VA_ARGS__),                              \
                 __extension__ ({                                        \
                         const __auto_type C_VAR(X, _xq) = (_x);         \
-                        _call(C_VAR(X, _xq));                           \
+                        _call(C_VAR(X, _xq), ## __VA_ARGS__);           \
                 }))
 
 /**
@@ -223,15 +223,15 @@ extern "C" {
  *
  * Return: Result of @_call is returned.
  */
-#define C_CC_MACRO2(_call, _x, _y) C_INTERNAL_CC_MACRO2(_call, __COUNTER__, (_x), __COUNTER__, (_y))
-#define C_INTERNAL_CC_MACRO2(_call, _xq, _x, _yq, _y)                   \
-        C_CC_IF(                                                        \
-                (C_CC_IS_CONST(_x) && C_CC_IS_CONST(_y)),               \
-                _call((_x), (_y)),                                      \
-                __extension__ ({                                        \
-                        const __auto_type C_VAR(X, _xq) = (_x);         \
-                        const __auto_type C_VAR(Y, _yq) = (_y);         \
-                        _call(C_VAR(X, _xq), C_VAR(Y, _yq));            \
+#define C_CC_MACRO2(_call, _x, _y, ...) C_INTERNAL_CC_MACRO2(_call, __COUNTER__, (_x), __COUNTER__, (_y), ## __VA_ARGS__)
+#define C_INTERNAL_CC_MACRO2(_call, _xq, _x, _yq, _y, ...)                      \
+        C_CC_IF(                                                                \
+                (C_CC_IS_CONST(_x) && C_CC_IS_CONST(_y)),                       \
+                _call((_x), (_y), ## __VA_ARGS__),                              \
+                __extension__ ({                                                \
+                        const __auto_type C_VAR(X, _xq) = (_x);                 \
+                        const __auto_type C_VAR(Y, _yq) = (_y);                 \
+                        _call(C_VAR(X, _xq), C_VAR(Y, _yq), ## __VA_ARGS__);    \
                 }))
 
 /**
@@ -245,16 +245,16 @@ extern "C" {
  *
  * Return: Result of @_call is returned.
  */
-#define C_CC_MACRO3(_call, _x, _y, _z) C_INTERNAL_CC_MACRO3(_call, __COUNTER__, (_x), __COUNTER__, (_y), __COUNTER__, (_z))
-#define C_INTERNAL_CC_MACRO3(_call, _xq, _x, _yq, _y, _zq, _z)                  \
-        C_CC_IF(                                                                \
-                (C_CC_IS_CONST(_x) && C_CC_IS_CONST(_y) && C_CC_IS_CONST(_z)),  \
-                _call((_x), (_y), (_z)),                                        \
-                __extension__ ({                                                \
-                        const __auto_type C_VAR(X, _xq) = (_x);                 \
-                        const __auto_type C_VAR(Y, _yq) = (_y);                 \
-                        const __auto_type C_VAR(Z, _zq) = (_z);                 \
-                        _call(C_VAR(X, _xq), C_VAR(Y, _yq), C_VAR(Z, _zq));     \
+#define C_CC_MACRO3(_call, _x, _y, _z, ...) C_INTERNAL_CC_MACRO3(_call, __COUNTER__, (_x), __COUNTER__, (_y), __COUNTER__, (_z), ## __VA_ARGS__)
+#define C_INTERNAL_CC_MACRO3(_call, _xq, _x, _yq, _y, _zq, _z, ...)                             \
+        C_CC_IF(                                                                                \
+                (C_CC_IS_CONST(_x) && C_CC_IS_CONST(_y) && C_CC_IS_CONST(_z)),                  \
+                _call((_x), (_y), (_z), ## __VA_ARGS__),                                        \
+                __extension__ ({                                                                \
+                        const __auto_type C_VAR(X, _xq) = (_x);                                 \
+                        const __auto_type C_VAR(Y, _yq) = (_y);                                 \
+                        const __auto_type C_VAR(Z, _zq) = (_z);                                 \
+                        _call(C_VAR(X, _xq), C_VAR(Y, _yq), C_VAR(Z, _zq), ## __VA_ARGS__);     \
                 }))
 
 /**
