@@ -124,34 +124,6 @@ extern "C" {
         })), (_expr), ((void)0)))
 
 /**
- * C_TYPE_MATCH() - match two variables/types for unqualified equality
- * @_a:         first variable/type
- * @_b:         second variable/type
- *
- * Compare two types, or types of two variables, for equality. Note that type
- * qualifiers are not respected by this comparison. Hence, only the actual
- * underlying types are compared.
- *
- * Return: 1 if both unqualified types are equal, 0 if not.
- */
-#define C_TYPE_MATCH(_a, _b) __builtin_types_compatible_p(__typeof__(_a), __typeof__(_b))
-
-/**
- * C_TYPE_IS_ARRAY() - evaluate whether given variable is of an array type
- * @_a:         variable/type to evaluate
- *
- * This function checks whether a given variable is an array type. Note that
- * the passed argument must either be an array or pointer, otherwise, this will
- * generate a syntax error.
- *
- * Note that "&a[0]" degrades an array to a pointer, and as such compares
- * unequal to "a" if it is an array. This is unique to array types.
- *
- * Return: 1 if it is an array type, 0 if not.
- */
-#define C_TYPE_IS_ARRAY(_a) (!C_TYPE_MATCH(__typeof__(_a), &(*(__typeof__(_a)*)0)[0]))
-
-/**
  * C_CC_IF() - conditional expression at compile time
  * @_cond:      condition
  * @_if:        if-clause
@@ -188,18 +160,6 @@ extern "C" {
 #define C_CC_IS_CONST(_expr) __builtin_constant_p(_expr)
 
 /**
- * C_CC_UNIQUE - generate unique compile-time integer
- *
- * This evaluates to a unique compile-time integer. Each occurrence of this
- * macro in the *preprocessed* C-code resolves to a different, unique integer.
- * Internally, it uses the __COUNTER__ gcc extension, and as such all
- * occurrences generate a dense set of integers.
- *
- * Return: This evaluates to an integer literal
- */
-#define C_CC_UNIQUE __COUNTER__
-
-/**
  * C_VAR() - generate unique variable name
  * @_x:         name of variable
  * @_uniq:      unique prefix, usually provided by __COUNTER__, optional
@@ -227,76 +187,6 @@ extern "C" {
 #define C_INTERNAL_VAR(_x, _uniq, _num, ...) C_VAR ## _num (_x, _uniq)
 #define C_VAR1(_x, _unused) C_VAR2(_x, C_CONCATENATE(line, __LINE__))
 #define C_VAR2(_x, _uniq) C_CONCATENATE(c_internal_var_unique_, C_CONCATENATE(_uniq, _x))
-
-/**
- * C_CC_ASSERT_MSG() - compile time assertion
- * @_cond:      condition
- * @_msg:       message to make the compiler print
- *
- * This is a compile-time assertion that can be used in any (constant)
- * expression. If @_cond evalutes to true, this is equivalent to a void
- * expression. If @_cond is false, this will cause a compiler error and print
- * @_msg into the compile log.
- *
- * XXX: Find some gcc hack to print @_msg while keeping the macro a constant
- * expression.
- *
- * Return: This macro evaluates to a void expression.
- */
-#define C_CC_ASSERT_MSG(_cond, _msg) ((void)C_CC_ASSERT1_MSG((_cond), _msg))
-
-/**
- * C_CC_ASSERT1_MSG() - compile time assertion
- * @_cond:      condition
- * @_msg:       message to make the compiler print
- *
- * This is the same as C_CC_ASSERT_MSG(), but evaluates to constant 1.
- *
- * Return: This macro evaluates to constant 1.
- */
-#define C_CC_ASSERT1_MSG(_cond, _msg) (sizeof(int[!(_cond) * -1]) * 0 + 1)
-
-/**
- * C_CC_ASSERT() - compile time assertion
- * @_cond:      condition
- *
- * Same as C_CC_ASSERT_MSG() but prints the condition as error message.
- *
- * Return: This macro evaluates to a void expression.
- */
-#define C_CC_ASSERT(_cond) ((void)C_CC_ASSERT1(_cond))
-
-/**
- * C_CC_ASSERT1() - compile time assertion
- * @_cond:      condition
- *
- * This is the same as C_CC_ASSERT(), but evaluates to constant 1.
- *
- * Return: This macro evaluates to constant 1.
- */
-#define C_CC_ASSERT1(_cond) C_CC_ASSERT1_MSG((_cond), #_cond)
-
-/**
- * C_CC_ASSERT_TO() - compile time assertion with explicit return value
- * @_cond:      condition to assert
- * @_expr:      expression to yield
- *
- * This is equivalent to C_CC_ASSERT1(_cond), but yields a return value of
- * @_expr, rather than constant 1.
- *
- * In case the compile-time assertion is false, this causes a compile-time
- * error and *also* evaluates as a void expression (and as such usually causes
- * a followup compile time error).
- *
- * Note that usually you'd do something like:
- *     (ASSERT(cond), expr)
- * thus using the comma-operator to yield a specific value. However,
- * suprisingly STD-C does *not* define the comma operator as constant
- * expression. Hence, we have to use C_CC_IF() to yield the same result.
- *
- * Return: This macro evaluates to @_expr.
- */
-#define C_CC_ASSERT_TO(_cond, _expr) C_CC_IF(C_CC_ASSERT1(_cond), (_expr), ((void)0))
 
 /**
  * C_CC_MACRO1() - provide save environment to a macro
