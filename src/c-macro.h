@@ -602,13 +602,13 @@ extern "C" {
 #define c_alloca8(_size) alloca(_size)
 
 /**
- * c_negative_errno() - return negative errno
+ * c_errno() - return valid errno
  *
  * This helper should be used to shut up gcc if you know 'errno' is valid (ie.,
  * errno is > 0). Instead of "return -errno;", use
- * "return c_negative_errno();" It will suppress bogus gcc warnings in case
- * it assumes 'errno' might be 0 (or <0) and thus the caller's error-handling
- * might not be triggered.
+ * "return -c_errno();" It will suppress bogus gcc warnings in case it assumes
+ * 'errno' might be 0 (or <0) and thus the caller's error-handling might not be
+ * triggered.
  *
  * This helper should be avoided whenever possible. However, occasionally we
  * really want to shut up gcc (especially with static/inline functions). In
@@ -619,10 +619,10 @@ extern "C" {
  * Note that you really should never use this helper to work around broken libc
  * calls or syscalls, not setting 'errno' correctly.
  *
- * Return: Negative error code is returned.
+ * Return: Positive error code is returned.
  */
-static inline int c_negative_errno(void) {
-        return _c_likely_(errno > 0) ? -errno : -EINVAL;
+static inline int c_errno(void) {
+        return _c_likely_(errno > 0) ? errno : EINVAL;
 }
 
 /*
