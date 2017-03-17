@@ -78,10 +78,14 @@ static void test_destructors(void) {
                         foo = malloc(sz);
                         assert(foo);
 
+                        assert(n_alloc < test_malloc_n);
+
                         bar = malloc(sz);
                         assert(bar);
                         bar = c_free(bar);
                         assert(!bar);
+
+                        assert(n_alloc < test_malloc_n);
                 }
                 assert(n_alloc == test_malloc_n);
 
