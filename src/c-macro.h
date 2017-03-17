@@ -124,22 +124,6 @@ extern "C" {
         })), (_expr), ((void)0)))
 
 /**
- * C_CC_IF() - conditional expression at compile time
- * @_cond:      condition
- * @_if:        if-clause
- * @_else:      else-clause
- *
- * This is a compile-time if-else-statement. Depending on whether the constant
- * expression @_cond is true or false, this evaluates to the passed clause. The
- * other clause is *not* evaluated, however, it may be checked for syntax
- * errors and *constant* expressions are evaluated.
- *
- * Return: Evaluates to either if-clause or else-clause, depending on whether
- *         the condition is true. The other clause is *not* evaluated.
- */
-#define C_CC_IF(_cond, _if, _else) __builtin_choose_expr(!!(_cond), _if, _else)
-
-/**
  * C_CC_IS_CONST() - check whether a value is known at compile time
  * @_expr:      expression
  *
@@ -199,7 +183,7 @@ extern "C" {
  */
 #define C_CC_MACRO1(_call, _x, ...) C_INTERNAL_CC_MACRO1(_call, __COUNTER__, (_x), ## __VA_ARGS__)
 #define C_INTERNAL_CC_MACRO1(_call, _xq, _x, ...)                       \
-        C_CC_IF(                                                        \
+        __builtin_choose_expr(                                          \
                 C_CC_IS_CONST(_x),                                      \
                 _call(_x, ## __VA_ARGS__),                              \
                 __extension__ ({                                        \
@@ -225,7 +209,7 @@ extern "C" {
  */
 #define C_CC_MACRO2(_call, _x, _y, ...) C_INTERNAL_CC_MACRO2(_call, __COUNTER__, (_x), __COUNTER__, (_y), ## __VA_ARGS__)
 #define C_INTERNAL_CC_MACRO2(_call, _xq, _x, _yq, _y, ...)                      \
-        C_CC_IF(                                                                \
+        __builtin_choose_expr(                                                  \
                 (C_CC_IS_CONST(_x) && C_CC_IS_CONST(_y)),                       \
                 _call((_x), (_y), ## __VA_ARGS__),                              \
                 __extension__ ({                                                \
@@ -247,7 +231,7 @@ extern "C" {
  */
 #define C_CC_MACRO3(_call, _x, _y, _z, ...) C_INTERNAL_CC_MACRO3(_call, __COUNTER__, (_x), __COUNTER__, (_y), __COUNTER__, (_z), ## __VA_ARGS__)
 #define C_INTERNAL_CC_MACRO3(_call, _xq, _x, _yq, _y, _zq, _z, ...)                             \
-        C_CC_IF(                                                                                \
+        __builtin_choose_expr(                                                                  \
                 (C_CC_IS_CONST(_x) && C_CC_IS_CONST(_y) && C_CC_IS_CONST(_z)),                  \
                 _call((_x), (_y), (_z), ## __VA_ARGS__),                                        \
                 __extension__ ({                                                                \
