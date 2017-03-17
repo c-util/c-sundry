@@ -318,12 +318,12 @@ extern "C" {
  * @_type:      type of the container struct this is embedded in
  * @_member:    name of the member within the struct
  */
-#define c_container_of(_ptr, _type, _member) c_internal_container_of(__COUNTER__, (_ptr), _type, _member)
-#define c_internal_container_of(_uniq, _ptr, _type, _member)                                    \
-        __extension__ ({                                                                        \
-                /* avoid `__typeof__' since it strips qualifiers */                             \
-                __auto_type C_VAR(A, _uniq) = 0 ? &((const _type *)0)->_member : (_ptr);        \
-                (_ptr) ? (_type*)( (char*)C_VAR(A, _uniq) - offsetof(_type, _member) ) : NULL;  \
+#define c_container_of(_ptr, _type, _member) C_CC_MACRO1(C_CONTAINER_OF, (_ptr), _type, _member)
+#define C_CONTAINER_OF(_ptr, _type, _member)                                            \
+        __extension__ ({                                                                \
+                /* avoid `__typeof__' since it strips qualifiers */                     \
+                __auto_type _var = 0 ? &((const _type *)0)->_member : (_ptr);           \
+                _var ? (_type*)( (char*)_var - offsetof(_type, _member) ) : NULL;       \
         })
 
 /**
