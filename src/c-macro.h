@@ -438,7 +438,7 @@ extern "C" {
  * Return: Evaluates to an 'int', the binary logarithm of the input.
  */
 #define c_log2(_val) C_CC_MACRO1(C_LOG2, (_val))
-#define C_LOG2(_val) ((_val) ? (sizeof(_val) * 8 - C_CLZ(_val) - 1) : 0)
+#define C_LOG2(_val) (sizeof(_val) * 8 - C_CLZ(_val) - !!(_val))
 
 /**
  * c_align_to() - align value to
