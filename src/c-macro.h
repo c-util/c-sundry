@@ -405,8 +405,7 @@ extern "C" {
  *
  * This counts the leading zeroes of the binary representation of @_val. Note
  * that @_val must be of an integer type greater than, or equal to, 'unsigned
- * int'. Also note that a value of 0 produces an undefined result (see your CPU
- * instruction manual for details why).
+ * int'.
  *
  * This macro evaluates the argument exactly once, and if the input is
  * constant, it also evaluates to a constant expression.
@@ -418,11 +417,14 @@ extern "C" {
  *
  * Return: Evaluates to an 'int', the number of leading zeroes.
  */
-#define c_clz(_val)                                     \
-        (_Generic((_val),                               \
-                unsigned int: __builtin_clz,            \
-               unsigned long: __builtin_clzl,           \
-          unsigned long long: __builtin_clzll)(_val))
+#define c_clz(_val) C_CC_MACRO1(C_CLZ, (_val))
+#define C_CLZ(_val)                                                     \
+        (_Generic((_val),                                               \
+                unsigned int: __builtin_clz,                            \
+               unsigned long: __builtin_clzl,                           \
+          unsigned long long: __builtin_clzll)                          \
+                /* clz(0) is undefined behavior, so work around it */   \
+                ((_val) | !(_val)) + !_c_likely_(_val))
 
 /**
  * c_log2() - binary logarithm
@@ -436,7 +438,7 @@ extern "C" {
  * Return: Evaluates to an 'int', the binary logarithm of the input.
  */
 #define c_log2(_val) C_CC_MACRO1(C_LOG2, (_val))
-#define C_LOG2(_val) ((_val) ? (sizeof(_val) * 8 - c_clz(_val) - 1) : 0)
+#define C_LOG2(_val) ((_val) ? (sizeof(_val) * 8 - C_CLZ(_val) - 1) : 0)
 
 /**
  * c_align_to() - align value to
@@ -484,7 +486,7 @@ extern "C" {
 #define c_align_power2(_val) C_CC_MACRO1(C_ALIGN_POWER2, (_val))
 #define C_ALIGN_POWER2(_val)                                                            \
         (((_val) == 1) ? 1 : /* clz(0) is undefined */                                  \
-                (c_clz((_val) - 1) < 1) ? 0 : /* shift-overflow is undefined */         \
+                (C_CLZ((_val) - 1) < 1) ? 0 : /* shift-overflow is undefined */         \
                         (((__typeof__(_val))1) << (C_LOG2((_val) - 1) + 1)))
 
 /**
