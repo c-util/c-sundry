@@ -34,6 +34,34 @@
  *    Never call those directly.
  *  - Inline helpers solely designed for _c_cleanup_(foobarp) always carry the
  *    'p' suffix (e.g., c_freep(), c_closep(), ...).
+ *
+ * XXX:
+ *
+ *  - LLVM supports constant folding statement expressions with more than one
+ *    statement. GCC does not. Example, this is valid in LLVM, but not GCC:
+ *
+ *              static int foo = ({ int bar = 5; bar; });
+ *
+ *    This means, we cannot use statement expressions to do constant folding.
+ *    As a workaround, we wrap those macros in __builtin_choose_expr() based on
+ *    whether the arguments are compile-time constant or not. This works, but
+ *    produces every errors twice, in case the caller provides wrong arguments.
+ *    This is ugly, but so far we did not find a way around it.
+ *
+ *  - _Generic() does not do constant folding on builtins on LLVM (GCC does it
+ *    just fine). Hence, the following works on GCC but not LLVM:
+ *
+ *              static int foo = _Generic(128, int: __builtin_clz)(128);
+ *
+ *    Reason is simple: The split between selecting the builtin and invoking it
+ *    makes LLVM forget that it is a constant expression. Note that the
+ *    following works fine:
+ *
+ *              static int foo = _Generic(128, int: __builtin_clz(128));
+ *
+ *    Here we call the built in the selector. With this, we would have to place
+ *    the selector into every case, thus producing ugly warnings for the cases
+ *    that end up not being selected.
  */
 
 #ifdef __cplusplus

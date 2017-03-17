@@ -30,3 +30,6 @@ test('API Symbol Visibility', test_api)
 
 test_bitmap = executable('test-bitmap', ['test-bitmap.c'], dependencies: libcsundry_dep)
 test('Bitmap Functionality', test_bitmap)
+
+test_macro = executable('test-macro', ['test-macro.c'], dependencies: libcsundry_dep, link_args: '-ldl')
+test('Utility Macros', test_macro)
