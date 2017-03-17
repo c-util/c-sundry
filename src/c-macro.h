@@ -321,9 +321,9 @@ extern "C" {
 #define c_container_of(_ptr, _type, _member) C_CC_MACRO1(C_CONTAINER_OF, (_ptr), _type, _member)
 #define C_CONTAINER_OF(_ptr, _type, _member)                                            \
         __extension__ ({                                                                \
-                /* avoid `__typeof__' since it strips qualifiers */                     \
-                __auto_type _var = 0 ? &((const _type *)0)->_member : (_ptr);           \
-                _var ? (_type*)( (char*)_var - offsetof(_type, _member) ) : NULL;       \
+                /* trigger warning if types do not match */                             \
+                (void)(&((_type *)0)->_member == (_ptr));                               \
+                _ptr ? (_type*)( (char*)_ptr - offsetof(_type, _member) ) : NULL;       \
         })
 
 /**
