@@ -469,9 +469,8 @@ extern "C" {
  */
 #define c_align_power2(_val) C_CC_MACRO1(C_ALIGN_POWER2, (_val))
 #define C_ALIGN_POWER2(_val)                                                            \
-        (((_val) == 1) ? 1 : /* clz(0) is undefined */                                  \
-                (C_CLZ((_val) - 1) < 1) ? 0 : /* shift-overflow is undefined */         \
-                        (((__typeof__(_val))1) << (C_LOG2((_val) - 1) + 1)))
+        ((C_CLZ((_val) - 1) < 1) ? 0 : /* shift-overflow is undefined */                \
+                (((__typeof__(_val))1) << (C_LOG2((_val) - 1) + !((_val) == 1))))
 
 /**
  * c_div_round_up() - calculate integer quotient but round up
