@@ -289,6 +289,15 @@ extern "C" {
 #define C_INTERNAL_CONCATENATE(_x, _y) _x ## _y
 
 /**
+ * C_EXPAND() - expand a tuple to a series of its values
+ * @_x:         tuple to expand
+ *
+ * Return: Evaluates to the expanded tuple
+ */
+#define C_EXPAND(_x) C_INTERNAL_EXPAND _x
+#define C_INTERNAL_EXPAND(...) __VA_ARGS__
+
+/**
  * C_ARRAY_SIZE() - calculate number of array elements at compile time
  * @_x:         array to calculate size of
  *

@@ -183,6 +183,7 @@ static void test_destructors(void) {
  *  - C_VAR()
  *  - C_STRINGIFY()
  *  - C_CONCATENATE()
+ *  - C_EXPAND()
  *  - C_ARRAY_SIZE()
  *  - C_DECIMAL_MAX()
  *  - c_container_of()
@@ -264,6 +265,19 @@ static void test_misc(int non_constant_expr) {
                 assert(!strcmp("foobarfoobar", C_STRINGIFY(C_CONCATENATE(TEST_TOKEN, foobar))));
                 assert(!strcmp("foobarfoobar", C_STRINGIFY(C_CONCATENATE(foobar, TEST_TOKEN))));
 #undef TEST_TOKEN
+        }
+
+        /*
+         * Test tuple expansion. This is used to strip tuple-wrappers in the
+         * pre-processor.
+         * We make sure that it works with {0,1,2}-tuples, as well as only
+         * strips a single layer.
+         */
+        {
+                assert(!strcmp(C_EXPAND(()) "foobar", "foo" "bar"));
+                assert(!strcmp(C_EXPAND(("foobar")), "foo" "bar"));
+                assert(!strcmp(C_EXPAND(("foobar", "foo" "bar"))));
+                assert(!strcmp C_EXPAND((("foobar", "foo" "bar"))));
         }
 
         /*
