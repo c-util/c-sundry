@@ -33,3 +33,6 @@ test('Bitmap Functionality', test_bitmap)
 
 test_macro = executable('test-macro', ['test-macro.c'], dependencies: libcsundry_dep, link_args: '-ldl')
 test('Utility Macros', test_macro)
+
+test_string = executable('test-string', ['test-string.c'], dependencies: libcsundry_dep)
+test('String Manipulators', test_string)
