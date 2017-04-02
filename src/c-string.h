@@ -16,11 +16,29 @@ extern "C" {
 #include <stdlib.h>
 
 /**
+ * c_string_compare() - compare two strings
+ * @a:          first string to compare, or NULL
+ * @b:          second string to compare, or NULL
+ *
+ * Compare two strings, the same way strcmp() does it.
+ * Additionally, NULL is allowed as input, which compares equal to itself
+ * and smaller than any other string.
+ *
+ * Return: Less than, greater than or equal to zero, as strcmp().
+ */
+_c_pure_ static inline int c_string_compare(const char *a, const char *b) {
+        if (a == b)
+                return 0;
+
+        return (!a || !b) ? (a ? 1 : -1) : strcmp(a, b);
+}
+
+/**
  * c_string_equal() - compare strings for equality
  * @a:          first string to compare, or NULL
  * @b:          second string to compare, or NULL
  *
- * Compare to strings for equality, the same way strcmp() does it.
+ * Compare two strings for equality, the same way strcmp() does it.
  * Additionally, NULL is allowed as input and compares equal to itself only.
  * Unlike strcmp(), this returns a boolean.
  *

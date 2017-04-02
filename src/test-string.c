@@ -6,6 +6,44 @@
 #include "c-macro.h"
 #include "c-string.h"
 
+static void test_compare(void) {
+        int r;
+
+        r = c_string_compare(NULL, NULL);
+        assert(r == 0);
+
+        r = c_string_compare("", NULL);
+        assert(r > 0);
+
+        r = c_string_compare(NULL, "");
+        assert(r < 0);
+
+        r = c_string_compare("a", "a");
+        assert(r == 0);
+
+        r = c_string_compare("a", "b");
+        assert(r < 0);
+}
+
+static void test_equal(void) {
+        bool b;
+
+        b = c_string_equal(NULL, NULL);
+        assert(b);
+
+        b = c_string_equal("", NULL);
+        assert(!b);
+
+        b = c_string_equal(NULL, "");
+        assert(!b);
+
+        b = c_string_equal("a", "a");
+        assert(b);
+
+        b = c_string_equal("a", "b");
+        assert(!b);
+}
+
 static void test_verify_from_hex(const char *hex) {
         _c_cleanup_(c_freep) char *raw = NULL, *copy = NULL;
         bool valid_hex1, valid_hex2;
@@ -43,6 +81,8 @@ static void test_hex(void) {
 }
 
 int main(int argc, char **argv) {
+        test_compare();
+        test_equal();
         test_hex();
         return 0;
 }
