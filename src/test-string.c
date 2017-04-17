@@ -107,10 +107,101 @@ static void test_utf8(void) {
         char *p = str;
         size_t len = strlen(str) + 1;
 
+        /* verify a mix of greek, czech and chinese */
         c_string_verify_utf8(&p, &len);
         assert(len == 1);
         assert(p == str + strlen(str));
         assert(*p == 0x00);
+
+        /* verify every 1-byte character */
+        for (uint32_t i = 0; i <= 0xFF; i++) {
+                char str[] = { i };
+                size_t len = sizeof(str);
+                char *p = str;
+
+                c_string_verify_utf8(&p, &len);
+                if (str[0] == 0 || (str[0] & 0b10000000) != 0)
+                        assert(p == str && len == sizeof(str));
+                else
+                        assert(p == str + sizeof(str) && len == 0);
+        }
+
+        /* verify every 2-byte character */
+        for (uint32_t i = 0; i <= 0xFFFF; i++) {
+                char str[] = { (i >> 8), i & 0xFF };
+                size_t len = sizeof(str);
+                char *p = str;
+                uint32_t n;
+
+                if ((str[0] & 0x80) == 0)
+                        /* ignore leading 1-byte characters */
+                        continue;
+
+                n = (str[0] & 0b00011111) << 6 | (str[1] & 0b00111111);
+
+                c_string_verify_utf8(&p, &len);
+
+                if (((str[0] & 0b11100000) != 0b11000000) ||
+                    ((str[1] & 0b11000000) != 0b10000000) ||
+                    (n < 0x80)) /* overlong */
+                        assert(p == str && len == sizeof(str));
+                else
+                        assert(p == str + sizeof(str) && len == 0);
+        }
+
+        /* verify every 3-byte character */
+        for (uint32_t i = 0; i <= 0xFFFFFF; i++) {
+                char str[] = { (i >> 16), (i >> 8) & 0xFF, i & 0xFF };
+                size_t len = sizeof(str);
+                char *p = str;
+                uint32_t n;
+
+                if (((str[0] & 0b10000000) == 0) ||
+                    ((str[0] & 0b11100000) == 0b11000000))
+                        /* ignore leading 1,2-byte characters */
+                        continue;
+
+                n = (str[0] & 0b00001111) << 12 | (str[1] & 0b00111111) << 6 | (str[2] & 0b00111111);
+
+                c_string_verify_utf8(&p, &len);
+
+                if (((str[0] & 0b11110000) != 0b11100000) ||
+                    ((str[1] & 0b11000000) != 0b10000000) ||
+                    ((str[2] & 0b11000000) != 0b10000000) ||
+                    (n < 0x800) || /* overlong */
+                    (n >= 0xD800 && n <= 0xDFFF)) /* surrogates */
+                        assert(p == str && len == sizeof(str));
+                else
+                        assert(p == str + sizeof(str) && len == 0);
+        }
+
+        /* verify every 4-byte character */
+        for (uint64_t i = 0; i <= 0xFFFFFFFF; i += 64) {
+                char str[] = { (i >> 24), (i >> 16) & 0xFF, (i >> 8) & 0xFF, i & 0xFF };
+                size_t len = sizeof(str);
+                char *p = str;
+                uint32_t n;
+
+                if (((str[0] & 0b10000000) == 0) ||
+                    ((str[0] & 0b11100000) == 0b11000000) ||
+                    ((str[0] & 0b11110000) == 0b11100000))
+                        /* ignore leading 1,2,3-byte characters */
+                        continue;
+
+                n = (str[0] & 0b00000111) << 18 | (str[1] & 0b00111111) << 12 | (str[2] & 0b00111111) << 6 | (str[3] & 0b00111111);
+
+                c_string_verify_utf8(&p, &len);
+
+                if (((str[0] & 0b11111000) != 0b11110000) ||
+                    ((str[1] & 0b11000000) != 0b10000000) ||
+                    ((str[2] & 0b11000000) != 0b10000000) ||
+                    ((str[3] & 0b11000000) != 0b10000000) ||
+                    (n < 0x10000) || /* overlong */
+                    (n > 0x10FFFF)) /* out of unicode range */
+                        assert(p == str && len == sizeof(str));
+                else
+                        assert(p == str + sizeof(str) && len == 0);
+        }
 }
 
 int main(int argc, char **argv) {
