@@ -91,15 +91,15 @@ static void test_ascii(void) {
         c_string_verify_ascii(&p, &len);
         assert(*p == 0x00);
         assert(p == str);
-        assert(len = sizeof(str));
+        assert(len == sizeof(str));
 
         ++p;
         --len;
 
         c_string_verify_ascii(&p, &len);
         assert((unsigned char)*p == 0x80);
-        assert(p = str + 0xFF);
-        assert(len  = sizeof(str) - 0xFF);
+        assert(p == str + 0x7F + 1);
+        assert(len == sizeof(str) - 0x7F - 1);
 }
 
 static void test_utf8(void) {
