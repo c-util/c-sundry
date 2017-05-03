@@ -8,6 +8,28 @@
 #include "c-syscall.h"
 
 /*
+ * Non-static Static Assert
+ *
+ * We used _Static_assert() a lot to test for compile-time constants here. This
+ * often results in something like:
+ *
+ *     _Static_assert(__builtin_constant_p(expr), "");
+ *
+ * Unfortunately, there are many gcc versions that are plain-broken regarding
+ * __builtin_constant_p(). That is, the result of the builtin is not constant
+ * itself, while gcc's formal model clearly defines it to be.
+ * This gets worse with several gcc-6 compilers which only behave that way if
+ * optimizations are enabled. See upstream bug-tracker for details:
+ *
+ *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=38377
+ *
+ * Anyway, to avoid this we don't use _Static_assert() whenever we use
+ * __builtin_constant_p() on non-constant expressions. But to document this, we
+ * use a separate macro.
+ */
+#define ASSERT_CC(_expr, _msg) assert(_expr)
+
+/*
  * Trivial Malloc Counters
  *
  * This test contains a hook for malloc() and free(). They use fallbacks to
@@ -211,10 +233,10 @@ static void test_misc(int non_constant_expr) {
          */
         {
                 foo = 11;
-                static_assert(C_CC_IS_CONST(5), "");
-                static_assert(!C_CC_IS_CONST(non_constant_expr), "");
-                static_assert(C_CC_IS_CONST(C_CC_IS_CONST(non_constant_expr)), "");
-                static_assert(!C_CC_IS_CONST(foo++), ""); /* *NOT* evaluated */
+                ASSERT_CC(C_CC_IS_CONST(5), "");
+                ASSERT_CC(!C_CC_IS_CONST(non_constant_expr), "");
+                ASSERT_CC(C_CC_IS_CONST(C_CC_IS_CONST(non_constant_expr)), "");
+                ASSERT_CC(!C_CC_IS_CONST(foo++), ""); /* *NOT* evaluated */
                 assert(foo == 11);
         }
 
@@ -295,7 +317,7 @@ static void test_misc(int non_constant_expr) {
                 int bar[8];
 
                 static_assert(C_ARRAY_SIZE(bar) == 8, "");
-                static_assert(C_CC_IS_CONST(C_ARRAY_SIZE(bar)), "");
+                ASSERT_CC(C_CC_IS_CONST(C_ARRAY_SIZE(bar)), "");
         }
 
         /*
@@ -347,8 +369,8 @@ static void test_misc(int non_constant_expr) {
                 assert(c_max(foo++, foo++) > 0);
                 assert(foo == 3);
 
-                static_assert(C_CC_IS_CONST(c_max(1, 5)), "");
-                static_assert(!C_CC_IS_CONST(c_max(1, non_constant_expr)), "");
+                ASSERT_CC(C_CC_IS_CONST(c_max(1, 5)), "");
+                ASSERT_CC(!C_CC_IS_CONST(c_max(1, non_constant_expr)), "");
 
                 foo = 0;
                 assert(c_min(1, 5) == 1);
@@ -359,8 +381,8 @@ static void test_misc(int non_constant_expr) {
                 assert(c_min(foo++, foo++) > 0);
                 assert(foo == 3);
 
-                static_assert(C_CC_IS_CONST(c_min(1, 5)), "");
-                static_assert(!C_CC_IS_CONST(c_min(1, non_constant_expr)), "");
+                ASSERT_CC(C_CC_IS_CONST(c_min(1, 5)), "");
+                ASSERT_CC(!C_CC_IS_CONST(c_min(1, non_constant_expr)), "");
         }
 
         /*
@@ -377,8 +399,8 @@ static void test_misc(int non_constant_expr) {
                 assert(c_less_by(foo++, foo++) >= 0);
                 assert(foo == 11);
 
-                static_assert(C_CC_IS_CONST(c_less_by(1, 5)), "");
-                static_assert(!C_CC_IS_CONST(c_less_by(1, non_constant_expr)), "");
+                ASSERT_CC(C_CC_IS_CONST(c_less_by(1, 5)), "");
+                ASSERT_CC(!C_CC_IS_CONST(c_less_by(1, non_constant_expr)), "");
 
                 foo = 8;
                 assert(c_clamp(foo, 1, 5) == 5);
@@ -388,8 +410,8 @@ static void test_misc(int non_constant_expr) {
                 assert(c_clamp(foo++, foo++, foo++) >= 0);
                 assert(foo == 12);
 
-                static_assert(C_CC_IS_CONST(c_clamp(0, 1, 5)), "");
-                static_assert(!C_CC_IS_CONST(c_clamp(1, 0, non_constant_expr)), "");
+                ASSERT_CC(C_CC_IS_CONST(c_clamp(0, 1, 5)), "");
+                ASSERT_CC(!C_CC_IS_CONST(c_clamp(1, 0, non_constant_expr)), "");
         }
 
         /*
@@ -412,7 +434,7 @@ static void test_misc(int non_constant_expr) {
                 assert(c_clz((uint64_t)UINT32_C(-1)) == 32);
                 assert(c_clz((uint64_t)UINT32_C(-1) + 2) == 31);
 
-                static_assert(!C_CC_IS_CONST(c_clz((unsigned int)non_constant_expr)), "");
+                ASSERT_CC(!C_CC_IS_CONST(c_clz((unsigned int)non_constant_expr)), "");
         }
 
         /*
@@ -449,7 +471,7 @@ static void test_misc(int non_constant_expr) {
                 assert(c_log2(UINT64_C(0x8000000000000000)) == 63);
                 assert(c_log2(UINT64_C(0xffffffffffffffff)) == 63);
 
-                static_assert(!C_CC_IS_CONST(c_log2((unsigned int)non_constant_expr)), "");
+                ASSERT_CC(!C_CC_IS_CONST(c_log2((unsigned int)non_constant_expr)), "");
         }
 
         /*
@@ -470,11 +492,11 @@ static void test_misc(int non_constant_expr) {
                 assert(c_align_to(UINT32_C(0xfffffff1), 8) == 0xfffffff8);
                 assert(c_align_to(UINT32_C(0xfffffff1), 8) == 0xfffffff8);
 
-                static_assert(C_CC_IS_CONST(c_align_to(16, 8)), "");
-                static_assert(!C_CC_IS_CONST(c_align_to(non_constant_expr, 8)), "");
-                static_assert(!C_CC_IS_CONST(c_align_to(16, non_constant_expr)), "");
-                static_assert(!C_CC_IS_CONST(c_align_to(16, non_constant_expr ? 8 : 16)), "");
-                static_assert(C_CC_IS_CONST(c_align_to(16, 7 + 1)), "");
+                ASSERT_CC(C_CC_IS_CONST(c_align_to(16, 8)), "");
+                ASSERT_CC(!C_CC_IS_CONST(c_align_to(non_constant_expr, 8)), "");
+                ASSERT_CC(!C_CC_IS_CONST(c_align_to(16, non_constant_expr)), "");
+                ASSERT_CC(!C_CC_IS_CONST(c_align_to(16, non_constant_expr ? 8 : 16)), "");
+                ASSERT_CC(C_CC_IS_CONST(c_align_to(16, 7 + 1)), "");
                 assert(c_align_to(15, non_constant_expr ? 8 : 16) == 16);
 
                 for (i = 0; i < 0xffff; ++i)
@@ -505,7 +527,7 @@ static void test_misc(int non_constant_expr) {
                 assert(c_align_power2(UINT32_C(5)) == 8);
                 assert(c_align_power2(UINT32_C(0x80000000)) == UINT32_C(0x80000000));
 
-                static_assert(!C_CC_IS_CONST(c_align_power2((unsigned int)non_constant_expr)), "");
+                ASSERT_CC(!C_CC_IS_CONST(c_align_power2((unsigned int)non_constant_expr)), "");
         }
 
         /*
@@ -528,8 +550,8 @@ static void test_misc(int non_constant_expr) {
                 assert(c_div_round_up(foo++, foo++) >= 0);
                 assert(foo == 11);
 
-                static_assert(C_CC_IS_CONST(c_div_round_up(1, 5)), "");
-                static_assert(!C_CC_IS_CONST(c_div_round_up(1, non_constant_expr)), "");
+                ASSERT_CC(C_CC_IS_CONST(c_div_round_up(1, 5)), "");
+                ASSERT_CC(!C_CC_IS_CONST(c_div_round_up(1, non_constant_expr)), "");
 
                 /* alternative calculation is [(x + y - 1) / y], but it may overflow */
                 for (i = 0; i <= 0xffff; ++i) {
