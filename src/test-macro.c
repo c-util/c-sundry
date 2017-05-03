@@ -274,10 +274,17 @@ static void test_misc(int non_constant_expr) {
          * strips a single layer.
          */
         {
-                assert(!strcmp(C_EXPAND(()) "foobar", "foo" "bar"));
-                assert(!strcmp(C_EXPAND(("foobar")), "foo" "bar"));
-                assert(!strcmp(C_EXPAND(("foobar", "foo" "bar"))));
-                assert(!strcmp C_EXPAND((("foobar", "foo" "bar"))));
+                /*
+                 * strcmp() might be a macro, so make sure we get a proper C
+                 * expression below. Otherwise, C_EXPAND() cannot be used that
+                 * way (since it would evaluate to a single macro argument).
+                 */
+                int (*f) (const char *, const char *) = strcmp;
+
+                assert(!f(C_EXPAND(()) "foobar", "foo" "bar"));
+                assert(!f(C_EXPAND(("foobar")), "foo" "bar"));
+                assert(!f(C_EXPAND(("foobar", "foo" "bar"))));
+                assert(!f C_EXPAND((("foobar", "foo" "bar"))));
         }
 
         /*
