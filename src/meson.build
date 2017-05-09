@@ -2,28 +2,30 @@
 # target: libcsundry.so
 #
 
-install_headers(
-        [
-                'c-bitmap.h',
-                'c-macro.h',
-                'c-ref.h',
-                'c-string.h',
-                'c-syscall.h',
-                'c-usec.h'
-       ],
-)
-
 libcsundry_dep = declare_dependency(
         include_directories: include_directories('.'),
-        version: meson.project_version()
+        version: meson.project_version(),
 )
 
-mod_pkgconfig.generate(
-        version: meson.project_version(),
-        name: 'libcsundry',
-        filebase: 'libcsundry',
-        description: 'Collection of C sundries'
-)
+if not meson.is_subproject()
+        install_headers(
+                [
+                        'c-bitmap.h',
+                        'c-macro.h',
+                        'c-ref.h',
+                        'c-string.h',
+                        'c-syscall.h',
+                        'c-usec.h',
+               ],
+        )
+
+        mod_pkgconfig.generate(
+                version: meson.project_version(),
+                name: 'libcsundry',
+                filebase: 'libcsundry',
+                description: 'Collection of C sundries',
+        )
+endif
 
 #
 # target: test-*
