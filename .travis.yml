@@ -8,21 +8,21 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-3.9
+            - llvm-toolchain-trusty-4.0
           packages:
-            - gcc-5
+            - gcc-6
       env:
-        - MATRIX_CC="gcc-5"
+        - MATRIX_CC="gcc-6"
     - os: linux
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-3.9
+            - llvm-toolchain-trusty-4.0
           packages:
-            - clang-3.9
+            - clang-4.0
       env:
-        - MATRIX_CC="clang-3.9"
+        - MATRIX_CC="clang-4.0"
 
 install:
   - curl -L "https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-linux.zip" -o "ninja-linux.zip"
