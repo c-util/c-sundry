@@ -1,28 +1,19 @@
 dist: trusty
 language: c
+os: linux
 
-matrix:
-  include:
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
-          packages:
-            - gcc-6
-      env:
-        - MATRIX_CC="gcc-6"
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
-          packages:
-            - clang-4.0
-      env:
-        - MATRIX_CC="clang-4.0"
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-trusty-4.0
+    packages:
+      - gcc-6
+      - clang-4.0
+
+env:
+  - MATRIX_CC="gcc-6"
+  - MATRIX_CC="clang-4.0"
 
 install:
   - curl -L "https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-linux.zip" -o "ninja-linux.zip"
