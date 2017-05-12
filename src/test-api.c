@@ -52,13 +52,16 @@ static void test_string(void) {
 }
 
 static void test_syscall(void) {
+        int (*f_clone) (unsigned long, void *) = c_syscall_clone;
+        int (*f_memfd_create) (const char *, unsigned int) = c_syscall_memfd_create;
         int r;
 
-        r = c_syscall_clone(~0UL, NULL);
-        assert(r < 0);
-
-        r = c_syscall_memfd_create(NULL, ~0U);
-        assert(r < 0);
+        /*
+         * Avoid running the clone, and memfd_create wrappers, since they might
+         * not be available on older kernels.
+         */
+        assert(!!f_clone);
+        assert(!!f_memfd_create);
 
         r = c_syscall_gettid();
         assert(r >= 0);
