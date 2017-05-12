@@ -4,6 +4,7 @@
 
 #include <dlfcn.h>
 #include <stdlib.h>
+#include <sys/eventfd.h>
 #include "c-macro.h"
 #include "c-syscall.h"
 
@@ -70,7 +71,7 @@ static void test_destructors(void) {
         {
                 int fd;
 
-                fd = c_syscall_memfd_create("foobar", 0);
+                fd = eventfd(0, EFD_CLOEXEC);
                 assert(fd >= 0);
 
                 /* verify c_close() returns -1 */
@@ -95,7 +96,7 @@ static void test_destructors(void) {
                 for (i = 0; i < 2; ++i) {
                         _c_cleanup_(c_closep) int t = -1;
 
-                        t = c_syscall_memfd_create("foobar", 0);
+                        t = eventfd(0, EFD_CLOEXEC);
                         assert(t >= 0);
                         assert(t == fd);
                 }
@@ -109,7 +110,7 @@ static void test_destructors(void) {
                 FILE *f;
                 int fd;
 
-                fd = c_syscall_memfd_create("foobar", 0);
+                fd = eventfd(0, EFD_CLOEXEC);
                 assert(fd >= 0);
 
                 f = fdopen(fd, "r");
@@ -138,7 +139,7 @@ static void test_destructors(void) {
                         _c_cleanup_(c_fclosep) FILE *t = NULL;
                         int tfd;
 
-                        tfd = c_syscall_memfd_create("foobar", 0);
+                        tfd = eventfd(0, EFD_CLOEXEC);
                         assert(tfd >= 0);
                         assert(tfd == fd); /* the same as before */
 
