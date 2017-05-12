@@ -30,50 +30,6 @@
 #define ASSERT_CC(_expr, _msg) assert(_expr)
 
 /*
- * Trivial Malloc Counters
- *
- * This test contains a hook for malloc() and free(). They use fallbacks to
- * their libc equivalents, but update the atomic counter @test_malloc_n. This
- * counter can be used to measure the number of calls to malloc() and free() in
- * protected environments. It is not meant to be authoritative, but safe in
- * trivial tests like this one.
- */
-static _Atomic size_t test_malloc_n;
-
-void *malloc(size_t size) {
-        static _Atomic(void *) next;
-        void *p;
-
-        if (!next) {
-                p = dlsym(RTLD_NEXT, "malloc");
-                assert(p);
-                next = p;
-        }
-
-        p = ((void *(*)(size_t))next)(size);
-        if (p)
-                ++test_malloc_n;
-
-        return p;
-}
-
-void free(void *ptr) {
-        static _Atomic(void *) next;
-        void *p;
-
-        if (!next) {
-                p = dlsym(RTLD_NEXT, "free");
-                assert(p);
-                next = p;
-        }
-
-        if (ptr)
-                --test_malloc_n;
-
-        ((void (*)(void *))next)(ptr);
-}
-
-/*
  * Tests for:
  *  - c_free*()
  *  - c_close*()
@@ -84,14 +40,12 @@ static void test_destructors(void) {
         int i;
 
         /*
-         * Verify that c_free*() works as expected. We have hooks into malloc()
-         * and free(), so simply verify the counter after a bunch of c_free*()
-         * calls.
+         * Verify that c_free*() works as expected. Since we want to support
+         * running under valgrind, there is no easy way to verify the
+         * correctness of free(). Hence, we simply rely on valgrind to catch
+         * the leaks.
          */
         {
-                size_t n_alloc;
-
-                n_alloc = test_malloc_n;
                 for (i = 0; i < 16; ++i) {
                         _c_cleanup_(c_freep) void *foo;
                         _c_cleanup_(c_freep) int **bar; /* supports any type */
@@ -100,16 +54,11 @@ static void test_destructors(void) {
                         foo = malloc(sz);
                         assert(foo);
 
-                        assert(n_alloc < test_malloc_n);
-
                         bar = malloc(sz);
                         assert(bar);
                         bar = c_free(bar);
                         assert(!bar);
-
-                        assert(n_alloc < test_malloc_n);
                 }
-                assert(n_alloc == test_malloc_n);
 
                 assert(c_free(NULL) == NULL);
         }
