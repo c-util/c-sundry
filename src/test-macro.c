@@ -185,7 +185,6 @@ static void test_misc(int non_constant_expr) {
                 foo = 11;
                 ASSERT_CC(C_CC_IS_CONST(5), "");
                 ASSERT_CC(!C_CC_IS_CONST(non_constant_expr), "");
-                ASSERT_CC(C_CC_IS_CONST(C_CC_IS_CONST(non_constant_expr)), "");
                 ASSERT_CC(!C_CC_IS_CONST(foo++), ""); /* *NOT* evaluated */
                 assert(foo == 11);
         }
