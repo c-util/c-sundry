@@ -18,6 +18,7 @@ extern "C" {
 #include <assert.h>
 #include <stdatomic.h>
 #include <stdlib.h>
+#include <stdnoreturn.h>
 
 typedef void (*CRefFn) (_Atomic unsigned long *ref, void *userdata);
 
@@ -152,8 +153,9 @@ static inline _Atomic unsigned long *c_ref_inc_unless_zero(_Atomic unsigned long
  * drop to 0. This release callback will abort the application if it is
  * actually called.
  */
-static inline void c_ref_unreachable(_Atomic unsigned long *ref, void *userdata) {
+noreturn static inline void c_ref_unreachable(_Atomic unsigned long *ref, void *userdata) {
         assert(0);
+        abort();
 }
 
 /**
