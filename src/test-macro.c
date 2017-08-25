@@ -279,7 +279,7 @@ static void test_misc(int non_constant_expr) {
                 static_assert(C_DECIMAL_MAX(char) == 4, "");
                 static_assert(C_DECIMAL_MAX(signed char) == 4, "");
                 static_assert(C_DECIMAL_MAX(unsigned char) == 4, "");
-                static_assert(C_DECIMAL_MAX(unsigned long) == 21, "");
+                static_assert(C_DECIMAL_MAX(unsigned long) == (sizeof(long) == 8 ? 21 : 11), "");
                 static_assert(C_DECIMAL_MAX(unsigned long long) == 21, "");
                 static_assert(C_DECIMAL_MAX(int32_t) == 11, "");
                 static_assert(C_DECIMAL_MAX(uint32_t) == 11, "");
