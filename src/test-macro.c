@@ -534,7 +534,7 @@ static void test_misc(int non_constant_expr) {
                 for (i = 1; i < 32; ++i) {
                         p = c_alloca8(i);
                         assert(p);
-                        assert(!((unsigned long)p & 8));
+                        assert(!((unsigned long)p & 7));
                 }
         }
 
