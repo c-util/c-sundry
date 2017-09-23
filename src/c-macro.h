@@ -541,10 +541,17 @@ extern "C" {
  *       macro is just for documentational purposes as it is very hard to find
  *       any documentation on this. Anyway, it is ABI and we can safely rely on
  *       it.
+ *       Furthermore, the __builtin_alloca() function uses
+ *       __BIGGEST_ALIGNMENT__ as reference. So lets just verify this is set
+ *       and higher than, or equal to, 8.
  *
  * Return: Pointer to allocated stack memory.
  */
 #define c_alloca8(_size) alloca(_size)
+
+#if !defined(__BIGGEST_ALIGNMENT__) || __BIGGEST_ALIGNMENT__ < 8
+#  error "__BIGGEST_ALIGNMENT__ < 8"
+#endif
 
 /**
  * c_errno() - return valid errno
